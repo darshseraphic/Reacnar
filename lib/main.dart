@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -52,11 +54,107 @@ class _ReacnarAppState extends State<ReacnarApp> {
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const MainNavigationHub(),
+      // Swap out the direct layout call for your custom Animated Splash pipeline
+      home: const AnimatedSplashScreen(
+        nextScreen: MainNavigationHub(),
+      ),
     );
   }
 }
 
+// =========================================================================
+// CUSTOM EMBEDDED ANIMATED SPLASH SCREEN WIDGET
+// =========================================================================
+class AnimatedSplashScreen extends StatefulWidget {
+  final Widget nextScreen;
+  const AnimatedSplashScreen({super.key, required this.nextScreen});
+
+  @override
+  State<AnimatedSplashScreen> createState() => _AnimatedSplashScreenState();
+}
+
+class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200), // Timing duration of logo fade animation
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
+    );
+
+    _fadeController.forward();
+
+    // Hold screen state for 2.5 seconds total runtime before routing out to core app
+    Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => widget.nextScreen,
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Displaying your custom assets file logo directly centered
+              Image.asset(
+                'assets/logo.png',
+                width: 100,          // Changed from 110 to 100 to match your other project
+                height: 100,         // Changed from 110 to 100 to match your other project
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.blur_on, size: 100, color: primaryColor); // Also adjusted fallback size to 100
+                },
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'REACNAR',
+                style: GoogleFonts.robotoMono(
+                  color: primaryColor.withOpacity(0.6),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// =========================================================================
+// REMAINDER UNCHANGED CORE SYSTEM NAVIGATION INTERFACE
+// =========================================================================
 class MainNavigationHub extends StatefulWidget {
   const MainNavigationHub({super.key});
 
