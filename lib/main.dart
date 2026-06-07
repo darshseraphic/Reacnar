@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:async';
+
 import 'features/react/reactscreen.dart';
 import 'features/analytics/analyticscreen.dart';
 import 'features/settings/settingscreen.dart';
@@ -54,7 +54,6 @@ class _ReacnarAppState extends State<ReacnarApp> {
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
       ),
-      // Swap out the direct layout call for your custom Animated Splash pipeline
       home: const AnimatedSplashScreen(
         nextScreen: MainNavigationHub(),
       ),
@@ -63,7 +62,7 @@ class _ReacnarAppState extends State<ReacnarApp> {
 }
 
 // =========================================================================
-// CUSTOM EMBEDDED ANIMATED SPLASH SCREEN WIDGET
+// CUSTOM EMBEDDED TEXT-ONLY FADE IN/OUT SPLASH SCREEN WIDGET
 // =========================================================================
 class AnimatedSplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -74,33 +73,49 @@ class AnimatedSplashScreen extends StatefulWidget {
 }
 
 class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _textOpacity;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
+
+    _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200), // Timing duration of logo fade animation
+      duration: const Duration(milliseconds: 2000),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-    );
+    // Sequence structure: Text name fades in, holds, and faints away cleanly
+    _textOpacity = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 40.0, // First 800ms: Smoothly Fades In the app name text
+      ),
+      TweenSequenceItem(
+        tween: ConstantTween<double>(1.0),
+        weight: 30.0, // Middle 600ms: Holds text fully visible on the layout
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30.0, // Last 600ms: Text name cleanly faints away to 0% opacity
+      ),
+    ]).animate(_animationController);
 
-    _fadeController.forward();
+    _animationController.forward();
 
-    // Hold screen state for 2.5 seconds total runtime before routing out to core app
-    Timer(const Duration(milliseconds: 2500), () {
+    // Navigation timer to push screen over to the main layout hub
+    Timer(const Duration(milliseconds: 2400), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => widget.nextScreen,
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
+              return FadeTransition(
+                opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                child: child,
+              );
             },
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: const Duration(milliseconds: 600),
           ),
         );
       }
@@ -109,7 +124,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
 
   @override
   void dispose() {
-    _fadeController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -120,31 +135,15 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Displaying your custom assets file logo directly centered
-              Image.asset(
-                'assets/logo.png',
-                width: 100,          // Changed from 110 to 100 to match your other project
-                height: 100,         // Changed from 110 to 100 to match your other project
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.blur_on, size: 100, color: primaryColor); // Also adjusted fallback size to 100
-                },
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'REACNAR',
-                style: GoogleFonts.robotoMono(
-                  color: primaryColor.withOpacity(0.6),
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.12,
-                ),
-              ),
-            ],
+          opacity: _textOpacity,
+          child: Text(
+            'REACNAR',
+            style: GoogleFonts.robotoMono(
+              color: primaryColor,
+              fontSize: 28, // Scaled up cleanly since it acts as the sole centerpiece
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.25,
+            ),
           ),
         ),
       ),

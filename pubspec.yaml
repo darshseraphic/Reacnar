@@ -2,7 +2,7 @@ name: Reacnar
 description: "React before you think."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.1.0+1
 
 environment:
   sdk: ^3.12.1
@@ -21,10 +21,32 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
-
-  # Add your assets configuration here:
   assets:
     - assets/logo.png
+
+# =========================================================================
+# LAUNCHER ICONS CONFIGURATION (Keeps your home screen app icon correct)
+# =========================================================================
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  min_sdk_android: 21
+
+# =========================================================================
+# NATIVE SPLASH ENGINE CONFIGURATION MATRIX
+# =========================================================================
+flutter_native_splash:
+  color: "#121212"           # Your dark/theme background color
+  # image: assets/logo.png   # REMOVED: Stops the big logo from showing on native boot
+
+  android_12:
+    color: "#121212"         # Matches background color for Android 12+
+    # image: assets/logo.png # REMOVED
+
+  fullscreen: true
