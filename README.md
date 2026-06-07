@@ -164,13 +164,18 @@ flutter run --release
 * **Encryption & Architecture:** The database utilizes the operating system's localized sandbox containment. Other applications installed on the system cannot read REACNAR's relational database files.
 * **Data Retention:** Retained indefinitely until manual deletion or complete application uninstallation occurs.
 
-  
-
 ## 11. Monetization
 
 * **Model:** 100% Free.
 * **No Paywalls:** All modes (Single, Burst, Endurance) are unlocked at first launch.
 * **No Advertisements:** Zero ad network tracking frameworks are included, keeping the codebase completely clean and preserving raw system processing cycles for execution timing precision.
+
+## 12. Roadmap (Future Milestones)
+
+* [ ] **Local Data Portability:** Build local JSON/CSV backup exporting and importing configurations directly out of the device storage directory.
+* [ ] **Custom Waveform Ingestion:** Allow users to import local `.wav` files into app sandboxing to configure custom alert sounds.
+* [ ] **External Peripheral Intercepts:** Implement low-level support for Bluetooth LE devices and USB-C hardware buttons to isolate input lag even further.
+
 <p align="center">
   <a href="https://github.com/darshseraphic/Reacnar/releases/download/v0.1.0/">
     <img 
@@ -179,10 +184,3 @@ flutter run --release
     />
   </a>
 </p>
-  
-
-## 12. Roadmap (Future Milestones)
-
-* [ ] **Local Data Portability:** Build local JSON/CSV backup exporting and importing configurations directly out of the device storage directory.
-* [ ] **Custom Waveform Ingestion:** Allow users to import local `.wav` files into app sandboxing to configure custom alert sounds.
-* [ ] **External Peripheral Intercepts:** Implement low-level support for Bluetooth LE devices and USB-C hardware buttons to isolate input lag even further.
