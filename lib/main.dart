@@ -61,9 +61,6 @@ class _ReacnarAppState extends State<ReacnarApp> {
   }
 }
 
-// =========================================================================
-// CUSTOM EMBEDDED TEXT-ONLY FADE IN/OUT SPLASH SCREEN WIDGET
-// =========================================================================
 class AnimatedSplashScreen extends StatefulWidget {
   final Widget nextScreen;
   const AnimatedSplashScreen({super.key, required this.nextScreen});
@@ -84,26 +81,23 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
-
-    // Sequence structure: Text name fades in, holds, and faints away cleanly
     _textOpacity = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 40.0, // First 800ms: Smoothly Fades In the app name text
+        weight: 40.0,
       ),
       TweenSequenceItem(
         tween: ConstantTween<double>(1.0),
-        weight: 30.0, // Middle 600ms: Holds text fully visible on the layout
+        weight: 30.0,
       ),
       TweenSequenceItem(
         tween: Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 30.0, // Last 600ms: Text name cleanly faints away to 0% opacity
+        weight: 30.0,
       ),
     ]).animate(_animationController);
 
     _animationController.forward();
 
-    // Navigation timer to push screen over to the main layout hub
     Timer(const Duration(milliseconds: 2400), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -140,7 +134,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
             'REACNAR',
             style: GoogleFonts.robotoMono(
               color: primaryColor,
-              fontSize: 28, // Scaled up cleanly since it acts as the sole centerpiece
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.25,
             ),
@@ -150,10 +144,6 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> with Single
     );
   }
 }
-
-// =========================================================================
-// REMAINDER UNCHANGED CORE SYSTEM NAVIGATION INTERFACE
-// =========================================================================
 class MainNavigationHub extends StatefulWidget {
   const MainNavigationHub({super.key});
 
