@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/database.dart';
 
 enum ArenaState { idle, waiting, triggered, finished, penalty }
+
 enum ArenaMode { normal, burst, click }
 
 class ReactScreen extends StatefulWidget {
@@ -26,12 +27,10 @@ class _ReactScreenState extends State<ReactScreen> {
 
   int _lastRecordedDelta = 0;
 
-  // Burst Trainer tracking matrices
   int _burstTotalTicks = 0;
   int _burstTicksFired = 0;
   final List<int> _burstDeltas = [];
 
-  // Click Speed Tester tracking matrices
   int _clickCount = 0;
   int _clickSecondsRemaining = 60;
 
@@ -62,19 +61,22 @@ class _ReactScreenState extends State<ReactScreen> {
     final settings = Hive.box('reacnar_settings');
     final double minDelay = settings.get('min_delay', defaultValue: 1.0);
     final double maxDelay = settings.get('max_delay', defaultValue: 10.0);
-    final bool hapticsEnabled = settings.get('haptics_enabled', defaultValue: true);
-
-    // =========================================================================
-    // MODE 1: NORMAL MODE ENGINE
-    // =========================================================================
+    final bool hapticsEnabled = settings.get(
+      'haptics_enabled',
+      defaultValue: true,
+    );
     if (_currentMode == ArenaMode.normal) {
-      if (_currentState == ArenaState.idle || _currentState == ArenaState.finished || _currentState == ArenaState.penalty) {
+      if (_currentState == ArenaState.idle ||
+          _currentState == ArenaState.finished ||
+          _currentState == ArenaState.penalty) {
         setState(() {
           _currentState = ArenaState.waiting;
           _lastRecordedDelta = 0;
         });
 
-        final randomRange = minDelay == maxDelay ? minDelay : minDelay + Random().nextDouble() * (maxDelay - minDelay);
+        final randomRange = minDelay == maxDelay
+            ? minDelay
+            : minDelay + Random().nextDouble() * (maxDelay - minDelay);
         final millisecondsDelay = (randomRange * 1000).toInt();
 
         _countdownTimer = Timer(Duration(milliseconds: millisecondsDelay), () {
@@ -98,12 +100,14 @@ class _ReactScreenState extends State<ReactScreen> {
           _currentState = antiCheat ? ArenaState.penalty : ArenaState.idle;
         });
 
-        LocalDatabase.commitRecord(ReactionRecord(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          reactionMs: 0,
-          isFalseStart: true,
-          timestamp: DateTime.now(),
-        ));
+        LocalDatabase.commitRecord(
+          ReactionRecord(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            reactionMs: 0,
+            isFalseStart: true,
+            timestamp: DateTime.now(),
+          ),
+        );
 
         if (hapticsEnabled) HapticFeedback.heavyImpact();
         return;
@@ -117,22 +121,22 @@ class _ReactScreenState extends State<ReactScreen> {
           _currentState = ArenaState.finished;
         });
 
-        LocalDatabase.commitRecord(ReactionRecord(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          reactionMs: _lastRecordedDelta,
-          isFalseStart: false,
-          timestamp: DateTime.now(),
-        ));
+        LocalDatabase.commitRecord(
+          ReactionRecord(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            reactionMs: _lastRecordedDelta,
+            isFalseStart: false,
+            timestamp: DateTime.now(),
+          ),
+        );
 
         if (hapticsEnabled) HapticFeedback.lightImpact();
         _precisionClock.reset();
       }
-    }
-    // =========================================================================
-    // MODE 2: BURST TRAINER ENGINE
-    // =========================================================================
-    else if (_currentMode == ArenaMode.burst) {
-      if (_currentState == ArenaState.idle || _currentState == ArenaState.finished || _currentState == ArenaState.penalty) {
+    } else if (_currentMode == ArenaMode.burst) {
+      if (_currentState == ArenaState.idle ||
+          _currentState == ArenaState.finished ||
+          _currentState == ArenaState.penalty) {
         setState(() {
           _currentState = ArenaState.waiting;
           _lastRecordedDelta = 0;
@@ -141,10 +145,15 @@ class _ReactScreenState extends State<ReactScreen> {
           _burstTotalTicks = 3 + Random().nextInt(3);
         });
 
-        final randomRange = minDelay == maxDelay ? minDelay : minDelay + Random().nextDouble() * (maxDelay - minDelay);
+        final randomRange = minDelay == maxDelay
+            ? minDelay
+            : minDelay + Random().nextDouble() * (maxDelay - minDelay);
         final millisecondsDelay = (randomRange * 1000).toInt();
 
-        _countdownTimer = Timer(Duration(milliseconds: millisecondsDelay), _fireBurstTick);
+        _countdownTimer = Timer(
+          Duration(milliseconds: millisecondsDelay),
+          _fireBurstTick,
+        );
         return;
       }
 
@@ -156,12 +165,14 @@ class _ReactScreenState extends State<ReactScreen> {
           _currentState = antiCheat ? ArenaState.penalty : ArenaState.idle;
         });
 
-        LocalDatabase.commitRecord(ReactionRecord(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          reactionMs: 0,
-          isFalseStart: true,
-          timestamp: DateTime.now(),
-        ));
+        LocalDatabase.commitRecord(
+          ReactionRecord(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            reactionMs: 0,
+            isFalseStart: true,
+            timestamp: DateTime.now(),
+          ),
+        );
 
         if (hapticsEnabled) HapticFeedback.heavyImpact();
         return;
@@ -173,13 +184,15 @@ class _ReactScreenState extends State<ReactScreen> {
         _burstDeltas.add(delta);
         _burstTicksFired++;
 
-        LocalDatabase.commitRecord(ReactionRecord(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          reactionMs: delta,
-          isFalseStart: false,
-          timestamp: DateTime.now(),
-          mode: 'burst', // Fix: Added mode tag for correct analytics sorting
-        ));
+        LocalDatabase.commitRecord(
+          ReactionRecord(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            reactionMs: delta,
+            isFalseStart: false,
+            timestamp: DateTime.now(),
+            mode: 'burst',
+          ),
+        );
 
         if (hapticsEnabled) HapticFeedback.lightImpact();
         _precisionClock.reset();
@@ -189,7 +202,10 @@ class _ReactScreenState extends State<ReactScreen> {
             _currentState = ArenaState.waiting;
           });
           int microInterval = 150 + Random().nextInt(300);
-          _countdownTimer = Timer(Duration(milliseconds: microInterval), _fireBurstTick);
+          _countdownTimer = Timer(
+            Duration(milliseconds: microInterval),
+            _fireBurstTick,
+          );
         } else {
           setState(() {
             _currentState = ArenaState.finished;
@@ -198,12 +214,10 @@ class _ReactScreenState extends State<ReactScreen> {
           });
         }
       }
-    }
-    // =========================================================================
-    // MODE 3: CLICK CHALLENGE ENGINE
-    // =========================================================================
-    else if (_currentMode == ArenaMode.click) {
-      if (_currentState == ArenaState.idle || _currentState == ArenaState.finished || _currentState == ArenaState.penalty) {
+    } else if (_currentMode == ArenaMode.click) {
+      if (_currentState == ArenaState.idle ||
+          _currentState == ArenaState.finished ||
+          _currentState == ArenaState.penalty) {
         setState(() {
           _currentState = ArenaState.triggered;
           _clickCount = 1;
@@ -218,14 +232,15 @@ class _ReactScreenState extends State<ReactScreen> {
                 _clickTimer?.cancel();
                 _currentState = ArenaState.finished;
 
-                // Fix: Log the final click volume correctly to the telemetry box
-                LocalDatabase.commitRecord(ReactionRecord(
-                  id: DateTime.now().microsecondsSinceEpoch.toString(),
-                  reactionMs: _clickCount,
-                  isFalseStart: false,
-                  timestamp: DateTime.now(),
-                  mode: 'click',
-                ));
+                LocalDatabase.commitRecord(
+                  ReactionRecord(
+                    id: DateTime.now().microsecondsSinceEpoch.toString(),
+                    reactionMs: _clickCount,
+                    isFalseStart: false,
+                    timestamp: DateTime.now(),
+                    mode: 'click',
+                  ),
+                );
               }
             });
           }
@@ -260,12 +275,13 @@ class _ReactScreenState extends State<ReactScreen> {
     final primaryColor = Theme.of(context).primaryColor;
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
     final isDark = scaffoldBg == Colors.black;
-    final borderLine = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFE5E5E5);
+    final borderLine = isDark
+        ? const Color(0xFF1F1F1F)
+        : const Color(0xFFE5E5E5);
 
     Color dotColor = scaffoldBg;
     String statusMessage = "";
 
-    // Setup visual states and specified label modifications
     if (_currentMode == ArenaMode.normal) {
       if (_currentState == ArenaState.idle) {
         statusMessage = "NORMAL:- TAP WHEN COLOR CHANGE.";
@@ -290,10 +306,12 @@ class _ReactScreenState extends State<ReactScreen> {
         statusMessage = "AWAITING UNPREDICTABLE BURST STREAM CLUSTER...";
       } else if (_currentState == ArenaState.triggered) {
         dotColor = primaryColor;
-        statusMessage = "BURST TICK FIRE ${_burstTicksFired + 1}/${_burstTotalTicks}: DETONATE NOW!";
+        statusMessage =
+            "BURST TICK FIRE ${_burstTicksFired + 1}/${_burstTotalTicks}: DETONATE NOW!";
       } else if (_currentState == ArenaState.finished) {
         dotColor = scaffoldBg;
-        statusMessage = "BURST COMPLETED! CLUSTER MEAN: ${_lastRecordedDelta}MS";
+        statusMessage =
+            "BURST COMPLETED! CLUSTER MEAN: ${_lastRecordedDelta}MS";
       } else if (_currentState == ArenaState.penalty) {
         dotColor = const Color(0xFFEF4444);
         statusMessage = "FALSE START PENALTY ROUTINE INJECTED";
@@ -304,7 +322,8 @@ class _ReactScreenState extends State<ReactScreen> {
         statusMessage = "CLICK:- CLICK AS MUCH AS YOU CAN.";
       } else if (_currentState == ArenaState.triggered) {
         dotColor = primaryColor.withOpacity(0.15);
-        statusMessage = "MASH DISPLAY BOUNDS! TAPS: $_clickCount | TIME: ${_clickSecondsRemaining}S";
+        statusMessage =
+            "MASH DISPLAY BOUNDS! TAPS: $_clickCount | TIME: ${_clickSecondsRemaining}S";
       } else if (_currentState == ArenaState.finished) {
         dotColor = scaffoldBg;
         statusMessage = "CHALLENGE COMPLETE: $_clickCount TAPS IN 60S!";
@@ -319,11 +338,13 @@ class _ReactScreenState extends State<ReactScreen> {
             alignment: Alignment.centerLeft,
             child: Text(
               'REACNAR // REFLEX FIELD',
-              style: GoogleFonts.robotoMono(color: primaryColor.withOpacity(0.5), fontSize: 13, fontWeight: FontWeight.bold),
+              style: GoogleFonts.robotoMono(
+                color: primaryColor.withOpacity(0.5),
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-
-          // Primary target interactive environment
           Expanded(
             child: GestureDetector(
               onTap: _triggerArenaAction,
@@ -347,7 +368,9 @@ class _ReactScreenState extends State<ReactScreen> {
                     statusMessage,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.robotoMono(
-                      color: _currentState == ArenaState.penalty ? const Color(0xFFEF4444) : primaryColor,
+                      color: _currentState == ArenaState.penalty
+                          ? const Color(0xFFEF4444)
+                          : primaryColor,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.02,
@@ -360,7 +383,6 @@ class _ReactScreenState extends State<ReactScreen> {
 
           const SizedBox(height: 12),
 
-          // Sub-Navigation Tab Matrix Line Layer
           Container(
             height: 44,
             decoration: BoxDecoration(

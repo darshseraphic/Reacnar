@@ -9,23 +9,24 @@ class SquareSliderThumbShape extends SliderComponentShape {
   const SquareSliderThumbShape({this.thumbSize = 8.0});
 
   @override
-  Size getPreferredSize(bool isEnabled, bool isDiscrete) => Size(thumbSize, thumbSize);
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) =>
+      Size(thumbSize, thumbSize);
 
   @override
   void paint(
-      PaintingContext context,
-      Offset center, {
-        required Animation<double> activationAnimation,
-        required Animation<double> enableAnimation,
-        required bool isDiscrete,
-        required TextPainter labelPainter,
-        required RenderBox parentBox,
-        required SliderThemeData sliderTheme,
-        required TextDirection textDirection,
-        required double value,
-        required double textScaleFactor,
-        required Size sizeWithOverflow,
-      }) {
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
     context.canvas.drawRect(
       Rect.fromCenter(center: center, width: thumbSize, height: thumbSize),
       Paint()
@@ -78,7 +79,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _pushSlidingSubTab(BuildContext context, String panelTitle, String informationBody) {
+  void _pushSlidingSubTab(
+    BuildContext context,
+    String panelTitle,
+    String informationBody,
+  ) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
@@ -86,8 +91,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
             position: animation.drive(
-              Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
-                  .chain(CurveTween(curve: Curves.easeInOutCubic)),
+              Tween(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOutCubic)),
             ),
             child: child,
           );
@@ -100,37 +107,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
     final isDark = Theme.of(context).scaffoldBackgroundColor == Colors.black;
-    final borderLine = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFE5E5E5);
+    final borderLine = isDark
+        ? const Color(0xFF1F1F1F)
+        : const Color(0xFFE5E5E5);
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('HARDWARE TUNING INTERFACE',
-              style: GoogleFonts.robotoMono(
-                  color: primaryColor, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: -0.02)),
+          Text(
+            'HARDWARE TUNING INTERFACE',
+            style: GoogleFonts.robotoMono(
+              color: primaryColor,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.02,
+            ),
+          ),
           const SizedBox(height: 24),
           Expanded(
             child: ListView(
               physics: const ClampingScrollPhysics(),
               children: [
-                _buildToggleRow('TACTILE HAPTIC CONFIRMATION', _haptics, (val) {
-                  setState(() => _haptics = val);
-                  _settingsBox.put('haptics_enabled', val);
-                }, primaryColor, borderLine),
-                _buildToggleRow('ANTI-CHEAT PENALTY GLOW', _antiCheat, (val) {
-                  setState(() => _antiCheat = val);
-                  _settingsBox.put('anti_cheat', val);
-                }, primaryColor, borderLine),
+                _buildToggleRow(
+                  'TACTILE HAPTIC CONFIRMATION',
+                  _haptics,
+                  (val) {
+                    setState(() => _haptics = val);
+                    _settingsBox.put('haptics_enabled', val);
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildToggleRow(
+                  'ANTI-CHEAT PENALTY GLOW',
+                  _antiCheat,
+                  (val) {
+                    setState(() => _antiCheat = val);
+                    _settingsBox.put('anti_cheat', val);
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('MIN EXPERIMENTAL DELAY',
-                        style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 10, fontWeight: FontWeight.bold)),
-                    Text('${_minDelay.toStringAsFixed(1)}s',
-                        style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(
+                      'MIN EXPERIMENTAL DELAY',
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '${_minDelay.toStringAsFixed(1)}s',
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -141,7 +180,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     inactiveTrackColor: primaryColor.withOpacity(0.15),
                     thumbColor: primaryColor,
                     thumbShape: const SquareSliderThumbShape(thumbSize: 8.0),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 0.0,
+                    ),
                   ),
                   child: Slider(
                     value: _minDelay,
@@ -159,10 +200,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('MAX EXPERIMENTAL DELAY',
-                        style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 10, fontWeight: FontWeight.bold)),
-                    Text('${_maxDelay.toStringAsFixed(1)}s',
-                        style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                    Text(
+                      'MAX EXPERIMENTAL DELAY',
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '${_maxDelay.toStringAsFixed(1)}s',
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -173,7 +226,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     inactiveTrackColor: primaryColor.withOpacity(0.15),
                     thumbColor: primaryColor,
                     thumbShape: const SquareSliderThumbShape(thumbSize: 8.0),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 0.0,
+                    ),
                   ),
                   child: Slider(
                     value: _maxDelay,
@@ -188,24 +243,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('DISPLAY THEME MATRIX',
-                    style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                Text(
+                  'DISPLAY THEME MATRIX',
+                  style: GoogleFonts.robotoMono(
+                    color: primaryColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 12),
-                _buildThemeSelectorTile('DARK TERMINAL MODE', 'DARK', _activeTheme, primaryColor),
-                _buildThemeSelectorTile('LIGHT FIELD MODE', 'LIGHT', _activeTheme, primaryColor),
+                _buildThemeSelectorTile(
+                  'DARK TERMINAL MODE',
+                  'DARK',
+                  _activeTheme,
+                  primaryColor,
+                ),
+                _buildThemeSelectorTile(
+                  'LIGHT FIELD MODE',
+                  'LIGHT',
+                  _activeTheme,
+                  primaryColor,
+                ),
                 const SizedBox(height: 24),
-                _buildNavigationLinkTile('SYSTEM OPERATION GUIDE', () {
-                  _pushSlidingSubTab(context, 'OPERATION GUIDE', _guideContent);
-                }, primaryColor, borderLine),
-                _buildNavigationLinkTile('PRIVACY POLICY PROTOCOL', () {
-                  _pushSlidingSubTab(context, 'PRIVACY POLICY', _privacyContent);
-                }, primaryColor, borderLine),
-                _buildNavigationLinkTile('OFFICIAL WEB PLATFORM', () {
-                  _redirectExternalUrl('https://reacnar.lovable.app');
-                }, primaryColor, borderLine),
-                _buildNavigationLinkTile('SUBMIT CENTRAL FEEDBACK', () {
-                  _redirectExternalUrl('https://reacnar.lovable.app/contact');
-                }, primaryColor, borderLine),
+                _buildNavigationLinkTile(
+                  'SYSTEM OPERATION GUIDE',
+                  () {
+                    _pushSlidingSubTab(
+                      context,
+                      'OPERATION GUIDE',
+                      _guideContent,
+                    );
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildNavigationLinkTile(
+                  'PRIVACY POLICY PROTOCOL',
+                  () {
+                    _pushSlidingSubTab(
+                      context,
+                      'PRIVACY POLICY',
+                      _privacyContent,
+                    );
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildNavigationLinkTile(
+                  'OFFICIAL WEB PLATFORM',
+                  () {
+                    _redirectExternalUrl('https://reacnar.lovable.app');
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildNavigationLinkTile(
+                  'SUBMIT CENTRAL FEEDBACK',
+                  () {
+                    _redirectExternalUrl('https://reacnar.lovable.app/contact');
+                  },
+                  primaryColor,
+                  borderLine,
+                ),
               ],
             ),
           ),
@@ -214,14 +313,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildToggleRow(String label, bool state, ValueChanged<bool> onChange, Color primary, Color line) {
+  Widget _buildToggleRow(
+    String label,
+    bool state,
+    ValueChanged<bool> onChange,
+    Color primary,
+    Color line,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line, width: 0.8))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: line, width: 0.8)),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: GoogleFonts.robotoMono(color: primary, fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: GoogleFonts.robotoMono(
+              color: primary,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           GestureDetector(
             onTap: () => onChange(!state),
             child: Container(
@@ -235,7 +349,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 120),
                 alignment: state ? Alignment.centerRight : Alignment.centerLeft,
-                child: Container(width: 12, height: 12, color: state ? primary : primary.withOpacity(0.3)),
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  color: state ? primary : primary.withOpacity(0.3),
+                ),
               ),
             ),
           ),
@@ -244,13 +362,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildThemeSelectorTile(String title, String code, String current, Color primary) {
+  Widget _buildThemeSelectorTile(
+    String title,
+    String code,
+    String current,
+    Color primary,
+  ) {
     final bool isSelected = current == code;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isSelected ? primary.withOpacity(0.06) : Colors.transparent,
-        border: Border.all(color: isSelected ? primary : primary.withOpacity(0.15), width: 1.2),
+        border: Border.all(
+          color: isSelected ? primary : primary.withOpacity(0.15),
+          width: 1.2,
+        ),
       ),
       child: InkWell(
         onTap: () => _updateThemeSelection(code),
@@ -261,9 +387,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: GoogleFonts.robotoMono(color: primary, fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: GoogleFonts.robotoMono(
+                  color: primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               if (isSelected)
-                Text('[ACTIVE]', style: GoogleFonts.robotoMono(color: primary, fontSize: 10, fontWeight: FontWeight.bold)),
+                Text(
+                  '[ACTIVE]',
+                  style: GoogleFonts.robotoMono(
+                    color: primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
             ],
           ),
         ),
@@ -271,9 +411,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildNavigationLinkTile(String label, VoidCallback actionTap, Color primary, Color line) {
+  Widget _buildNavigationLinkTile(
+    String label,
+    VoidCallback actionTap,
+    Color primary,
+    Color line,
+  ) {
     return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line, width: 0.8))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: line, width: 0.8)),
+      ),
       child: InkWell(
         onTap: actionTap,
         child: Padding(
@@ -281,8 +428,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: GoogleFonts.robotoMono(color: primary, fontSize: 11, fontWeight: FontWeight.w600)),
-              Text('//', style: GoogleFonts.robotoMono(color: primary.withOpacity(0.25), fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(
+                label,
+                style: GoogleFonts.robotoMono(
+                  color: primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '//',
+                style: GoogleFonts.robotoMono(
+                  color: primary.withOpacity(0.25),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),
@@ -290,8 +451,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-
-// ── Static content ────────────────────────────────────────────────────────────
 
 const String _guideContent = '''
 **REACNAR OPERATION GUIDE**
@@ -361,21 +520,28 @@ Reacnar does not knowingly collect data from any user regardless of age, as no d
 For questions or concerns regarding this policy, use the SUBMIT CENTRAL FEEDBACK link to reach the development team.
 ''';
 
-// ── Sliding info view ─────────────────────────────────────────────────────────
-
 class SlidingInformationView extends StatelessWidget {
   final String title;
   final String content;
 
-  const SlidingInformationView({super.key, required this.title, required this.content});
+  const SlidingInformationView({
+    super.key,
+    required this.title,
+    required this.content,
+  });
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
     final isDark = Theme.of(context).scaffoldBackgroundColor == Colors.black;
-    final borderLine = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFE5E5E5);
+    final borderLine = isDark
+        ? const Color(0xFF1F1F1F)
+        : const Color(0xFFE5E5E5);
     final baseTextStyle = GoogleFonts.robotoMono(
-        color: primaryColor.withOpacity(0.8), fontSize: 11, height: 1.6);
+      color: primaryColor.withOpacity(0.8),
+      fontSize: 11,
+      height: 1.6,
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -388,17 +554,32 @@ class SlidingInformationView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title,
-                      style: GoogleFonts.robotoMono(
-                          color: primaryColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: GoogleFonts.robotoMono(
+                      color: primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(border: Border.all(color: primaryColor, width: 1.2)),
-                      child: Text('RETURN',
-                          style: GoogleFonts.robotoMono(
-                              color: primaryColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: primaryColor, width: 1.2),
+                      ),
+                      child: Text(
+                        'RETURN',
+                        style: GoogleFonts.robotoMono(
+                          color: primaryColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -427,15 +608,22 @@ class SlidingInformationView extends StatelessWidget {
         spans.add(TextSpan(text: text.substring(lastIndex, match.start)));
       }
       final String matchText = match.group(0)!;
-      spans.add(TextSpan(
-        text: matchText.substring(2, matchText.length - 2),
-        style: baseStyle.copyWith(
-            fontWeight: FontWeight.bold, color: baseStyle.color?.withOpacity(1.0)),
-      ));
+      spans.add(
+        TextSpan(
+          text: matchText.substring(2, matchText.length - 2),
+          style: baseStyle.copyWith(
+            fontWeight: FontWeight.bold,
+            color: baseStyle.color?.withOpacity(1.0),
+          ),
+        ),
+      );
       lastIndex = match.end;
     }
-    if (lastIndex < text.length) spans.add(TextSpan(text: text.substring(lastIndex)));
+    if (lastIndex < text.length)
+      spans.add(TextSpan(text: text.substring(lastIndex)));
 
-    return RichText(text: TextSpan(style: baseStyle, children: spans));
+    return RichText(
+      text: TextSpan(style: baseStyle, children: spans),
+    );
   }
 }
