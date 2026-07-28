@@ -41,7 +41,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     if (_currentMode == AnalyticsMode.burst) targetModeStr = 'burst';
     if (_currentMode == AnalyticsMode.click) targetModeStr = 'click';
 
-    final records = allRecords.where((element) => element.mode == targetModeStr).toList();
+    final records = allRecords
+        .where((element) => element.mode == targetModeStr)
+        .toList();
 
     if (records.isEmpty) {
       setState(() {
@@ -54,15 +56,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       });
       return;
     }
-
-    // Fix: Intelligently define bounds relative to the current analysis mode
     int currentFastest = _currentMode == AnalyticsMode.click ? 0 : 99999;
     int currentSlowest = _currentMode == AnalyticsMode.click ? 0 : 99999;
 
     int validTicksSum = 0;
     int validTicksCount = 0;
     int falseStarts = 0;
-    Map<int, List<int>> dailyBlocks = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: []};
+    Map<int, List<int>> dailyBlocks = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+      7: [],
+    };
 
     for (var record in records) {
       if (record.isFalseStart) {
@@ -70,16 +78,17 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       } else {
         validTicksCount++;
         validTicksSum += record.reactionMs;
-
-        // Fix: Repaired min/max loop traps to prevent inverted click thresholds
         if (_currentMode == AnalyticsMode.click) {
-          if (record.reactionMs > currentFastest) currentFastest = record.reactionMs;
+          if (record.reactionMs > currentFastest)
+            currentFastest = record.reactionMs;
           if (currentSlowest == 0 || record.reactionMs < currentSlowest) {
             currentSlowest = record.reactionMs;
           }
         } else {
-          if (record.reactionMs < currentFastest) currentFastest = record.reactionMs;
-          if (record.reactionMs > currentSlowest) currentSlowest = record.reactionMs;
+          if (record.reactionMs < currentFastest)
+            currentFastest = record.reactionMs;
+          if (record.reactionMs > currentSlowest)
+            currentSlowest = record.reactionMs;
         }
 
         int weekday = record.timestamp.weekday;
@@ -89,11 +98,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
     setState(() {
       _filteredHistory = records;
-      // Fix: Stripped click mode out of 99999 checks entirely to prevent zeros
-      _fastest = (_currentMode != AnalyticsMode.click && currentFastest == 99999) ? 0 : currentFastest;
-      _slowest = (_currentMode != AnalyticsMode.click && currentSlowest == 99999) ? 0 : currentSlowest;
+      _fastest =
+          (_currentMode != AnalyticsMode.click && currentFastest == 99999)
+          ? 0
+          : currentFastest;
+      _slowest =
+          (_currentMode != AnalyticsMode.click && currentSlowest == 99999)
+          ? 0
+          : currentSlowest;
       _totalFalseStarts = falseStarts;
-      _overallAverage = validTicksCount > 0 ? validTicksSum / validTicksCount : 0.0;
+      _overallAverage = validTicksCount > 0
+          ? validTicksSum / validTicksCount
+          : 0.0;
       _dayAveragesMap = dailyBlocks;
     });
   }
@@ -119,8 +135,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final primaryColor = Theme.of(context).primaryColor;
     final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
     final isDark = scaffoldBg == Colors.black;
-    final borderLine = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFE5E5E5);
-    final List<String> shortDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    final borderLine = isDark
+        ? const Color(0xFF1F1F1F)
+        : const Color(0xFFE5E5E5);
+    final List<String> shortDays = [
+      'MON',
+      'TUE',
+      'WED',
+      'THU',
+      'FRI',
+      'SAT',
+      'SUN',
+    ];
 
     String profileLabel = "BIOLOGICAL PERFORMANCE PROFILE";
     String counterLabel = "SYSTEM TOTAL ENGAGEMENTS";
@@ -152,23 +178,39 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Text(
             'TELEMETRY DASHBOARD',
             style: GoogleFonts.robotoMono(
-                color: primaryColor, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: -0.02),
+              color: primaryColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.02,
+            ),
           ),
           const SizedBox(height: 20),
 
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(border: Border.all(color: primaryColor, width: 0.8)),
+            decoration: BoxDecoration(
+              border: Border.all(color: primaryColor, width: 0.8),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(profileLabel,
-                    style: GoogleFonts.robotoMono(color: primaryColor.withOpacity(0.5), fontSize: 9)),
+                Text(
+                  profileLabel,
+                  style: GoogleFonts.robotoMono(
+                    color: primaryColor.withOpacity(0.5),
+                    fontSize: 9,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(_getBiologicalTier(_overallAverage),
-                    style: GoogleFonts.robotoMono(
-                        color: primaryColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(
+                  _getBiologicalTier(_overallAverage),
+                  style: GoogleFonts.robotoMono(
+                    color: primaryColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -182,8 +224,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ? 0.0
                   : dayTimes.reduce((a, b) => a + b) / dayTimes.length;
 
-              double maxHeightLimit = _currentMode == AnalyticsMode.click ? 500.0 : 1000.0;
-              double barCalculation = (avg / maxHeightLimit * 80).clamp(4.0, 80.0);
+              double maxHeightLimit = _currentMode == AnalyticsMode.click
+                  ? 500.0
+                  : 1000.0;
+              double barCalculation = (avg / maxHeightLimit * 80).clamp(
+                4.0,
+                80.0,
+              );
 
               return Expanded(
                 child: Column(
@@ -199,12 +246,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(shortDays[index],
-                        style: GoogleFonts.robotoMono(color: primaryColor, fontSize: 9)),
+                    Text(
+                      shortDays[index],
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor,
+                        fontSize: 9,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(avg == 0.0 ? '-' : '${avg.toInt()}',
-                        style: GoogleFonts.robotoMono(
-                            color: primaryColor.withOpacity(0.5), fontSize: 8)),
+                    Text(
+                      avg == 0.0 ? '-' : '${avg.toInt()}',
+                      style: GoogleFonts.robotoMono(
+                        color: primaryColor.withOpacity(0.5),
+                        fontSize: 8,
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -217,12 +273,36 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             child: ListView(
               physics: const ClampingScrollPhysics(),
               children: [
-                _buildMetricRow(counterLabel, '${_filteredHistory.length}', primaryColor, borderLine),
-                _buildMetricRow(primaryStatLabel, primaryValue, primaryColor, borderLine),
-                _buildMetricRow(secondaryStatLabel, secondaryValue, primaryColor, borderLine),
-                _buildMetricRow(averageStatLabel, averageValue, primaryColor, borderLine),
-                _buildMetricRow('ANTI-CHEAT INFRACTIONS TRAPPED', '$_totalFalseStarts',
-                    const Color(0xFFEF4444), borderLine),
+                _buildMetricRow(
+                  counterLabel,
+                  '${_filteredHistory.length}',
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildMetricRow(
+                  primaryStatLabel,
+                  primaryValue,
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildMetricRow(
+                  secondaryStatLabel,
+                  secondaryValue,
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildMetricRow(
+                  averageStatLabel,
+                  averageValue,
+                  primaryColor,
+                  borderLine,
+                ),
+                _buildMetricRow(
+                  'ANTI-CHEAT INFRACTIONS TRAPPED',
+                  '$_totalFalseStarts',
+                  const Color(0xFFEF4444),
+                  borderLine,
+                ),
                 const SizedBox(height: 16),
                 InkWell(
                   onTap: () async {
@@ -232,12 +312,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   child: Container(
                     height: 40,
                     alignment: Alignment.center,
-                    decoration:
-                    BoxDecoration(border: Border.all(color: const Color(0xFFEF4444), width: 0.8)),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFFEF4444),
+                        width: 0.8,
+                      ),
+                    ),
                     child: Text(
                       'PURGE ALL SYSTEM METRICS',
                       style: GoogleFonts.robotoMono(
-                          color: const Color(0xFFEF4444), fontSize: 10, fontWeight: FontWeight.bold),
+                        color: const Color(0xFFEF4444),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -248,14 +335,28 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
           Container(
             height: 44,
-            decoration: BoxDecoration(border: Border.all(color: borderLine, width: 0.8)),
+            decoration: BoxDecoration(
+              border: Border.all(color: borderLine, width: 0.8),
+            ),
             child: Row(
               children: [
-                _buildAnalyticsModeTab(AnalyticsMode.normal, 'NORMAL', primaryColor),
+                _buildAnalyticsModeTab(
+                  AnalyticsMode.normal,
+                  'NORMAL',
+                  primaryColor,
+                ),
                 Container(width: 0.8, color: borderLine),
-                _buildAnalyticsModeTab(AnalyticsMode.burst, 'BURST', primaryColor),
+                _buildAnalyticsModeTab(
+                  AnalyticsMode.burst,
+                  'BURST',
+                  primaryColor,
+                ),
                 Container(width: 0.8, color: borderLine),
-                _buildAnalyticsModeTab(AnalyticsMode.click, 'CLICK', primaryColor),
+                _buildAnalyticsModeTab(
+                  AnalyticsMode.click,
+                  'CLICK',
+                  primaryColor,
+                ),
               ],
             ),
           ),
@@ -264,7 +365,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildAnalyticsModeTab(AnalyticsMode mode, String label, Color primary) {
+  Widget _buildAnalyticsModeTab(
+    AnalyticsMode mode,
+    String label,
+    Color primary,
+  ) {
     final bool isActive = _currentMode == mode;
     return Expanded(
       child: InkWell(
@@ -290,7 +395,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget _buildMetricRow(String title, String data, Color primary, Color line) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line, width: 0.8))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: line, width: 0.8)),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -298,13 +405,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             child: Text(
               title,
               style: GoogleFonts.robotoMono(
-                  color: primary.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.bold),
+                color: primary.withOpacity(0.6),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(data,
-              style: GoogleFonts.robotoMono(
-                  color: primary, fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(
+            data,
+            style: GoogleFonts.robotoMono(
+              color: primary,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
