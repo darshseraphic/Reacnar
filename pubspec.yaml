@@ -29,24 +29,15 @@ flutter:
   assets:
     - assets/logo.png
 
-# =========================================================================
-# LAUNCHER ICONS CONFIGURATION (Keeps your home screen app icon correct)
-# =========================================================================
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/logo.png"
   min_sdk_android: 21
 
-# =========================================================================
-# NATIVE SPLASH ENGINE CONFIGURATION MATRIX
-# =========================================================================
 flutter_native_splash:
-  color: "#121212"           # Your dark/theme background color
-  # image: assets/logo.png   # REMOVED: Stops the big logo from showing on native boot
+  color: "#121212"
 
   android_12:
-    color: "#121212"         # Matches background color for Android 12+
-    # image: assets/logo.png # REMOVED
-
+    color: "#121212"
   fullscreen: true
