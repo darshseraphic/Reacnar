@@ -4,6 +4,18 @@ An ultra-low latency, cybernetic-inspired reaction time measurement, neuro-motor
 
 ## Executive Summary & Core Philosophy
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3fe0193b-ebe4-4150-9d45-2fedbde244da" alt="react - Light" width="31%" />
+  <img src="https://github.com/user-attachments/assets/c3736101-479d-49b7-a385-b042a6425769" alt="stat - Light" width="31%" />
+  <img src="https://github.com/user-attachments/assets/ba762cda-9d39-4ce6-9b2d-979e66eb26cf" alt="setting - Light" width="31%" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/261df632-6ca7-487f-9a0a-8a463d8fe529" alt="react - Dark" width="31%" />
+  <img src="https://github.com/user-attachments/assets/db6b7169-efb2-4add-b4ad-41e819cd32ad" alt="stat - Dark" width="31%" />
+  <img src="https://github.com/user-attachments/assets/31983ca6-eb63-4820-b2ad-66fb4bc4398f" alt="Setting - Dark" width="31%" />
+</p>
+
 **REACNAR // REFLEX FIELD** is a professional-grade neuro-motor benchmarking and reaction conditioning engine built to analyze human reflex dynamics with sub-millisecond precision. Developed around a brutalist, distraction-free aesthetic, Reacnar strips away the bloat, animations, gamified pop-ups, and intrusive network overhead typical of modern visual tools. What remains is a pure, high-precision laboratory environment optimized for raw biological input and instantaneous visual-haptic telemetry feedback.
 
 In high-stakes environments—ranging from elite esports competition and high-speed motorsport to combat sports and tactical operations—a fraction of a millisecond dictates the line between success and failure. Reacnar provides an unadulterated field for testing, tracking, and conditioning neuromuscular latency. By removing input lag, background computation tasks, and visual noise, Reacnar acts as an uncompromising mirror to your biological processing speed.
