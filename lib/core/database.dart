@@ -5,7 +5,7 @@ class ReactionRecord {
   final int reactionMs;
   final bool isFalseStart;
   final DateTime timestamp;
-  final String mode; // 'normal', 'burst', or 'click'
+  final String mode;
 
   ReactionRecord({
     required this.id,
