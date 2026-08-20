@@ -33,3 +33,4 @@ android/app/build/
 android/.gradle/
 .dart_tool/ios/
 windows/
+ios/
