@@ -27,10 +27,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
 /build/
 android/app/build/
 android/.gradle/
 .dart_tool/ios/
 windows/
 ios/
+android/build/
+android/.gradle/
